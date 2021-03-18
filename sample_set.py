@@ -6,9 +6,9 @@ import numpy
 
 from dataset import Dataset, MOTIF_LENGTH, Instance, LEFT_SIDE, RIGHT_SIDE
 
-EXPO = 4
+EXPO = 3
 SIDE = 6
-N_RANDOM_INSTANCES = 2000
+N_RANDOM_INSTANCES = 5000
 LAMBDA = 1
 
 
@@ -130,11 +130,11 @@ class SampleSet:
                 )
 
             for j in range(SIDE):
-                frequency_sum = 0
+                average_frequency = 0
                 for k in range(j, j + dataset.w - SIDE + 1):
-                    frequency_sum += frequencies[ch][k] / dataset.background_frequencies[ch]
-                frequency_sum /= dataset.w - SIDE + 1
-                SampleSet.append_expo_to_vector(vector, frequency_sum)
+                    average_frequency += frequencies[ch][k] / dataset.background_frequencies[ch]
+                average_frequency /= dataset.w - SIDE + 1
+                SampleSet.append_expo_to_vector(vector, average_frequency)
 
         return numpy.array(vector)
 
@@ -154,7 +154,7 @@ class SampleSet:
                         dataset.sequences[i].content[k + dataset.w:k + dataset.w + RIGHT_SIDE]
                     )
 
-                    if random.randrange(1, 11) == 1:
+                    if random.randrange(10) in range(10):
                         x_samples.append(
                             SampleSet.frequencies_to_vector(
                                 dataset,

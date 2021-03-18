@@ -33,7 +33,17 @@ if __name__ == '__main__':
     print(f"Training set variance score: {model.score(samples.training_x_samples, samples.training_y_samples)}")
     print(f"Testing set variance score: {model.score(samples.testing_x_samples, samples.testing_y_samples)}")
 
-    result_file = open("coef.txt", "w")
+    coef_file = open("coef.txt", "w")
     for x in model.coef_:
-        result_file.write("{:.10e}".format(x))
+        coef_file.write("{:.10f}\n".format(x))
+
+    mean_file = open("mean.txt", "w")
+    for x in samples.mean:
+        mean_file.write("{:.10f}\n".format(x))
+
+    for i in range(10):
+        print(samples.training_y_samples[i], numpy.dot(samples.training_x_samples[i], model.coef_))
+
+    for i in range(10):
+        print(samples.testing_y_samples[i], numpy.dot(samples.testing_x_samples[i], model.coef_))
 
