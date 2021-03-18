@@ -1,0 +1,6 @@
+/data
+/.venv
+/.idea
+*.pyc
+coef.txt
+/__pycache__/
