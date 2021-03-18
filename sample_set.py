@@ -165,7 +165,7 @@ class SampleSet:
                             SampleSet.score_candidate_instances(
                                 dataset,
                                 instances
-                            )
+                            ) + LAMBDA*numpy.linalg.norm(numpy.subtract(x_samples[-1], mean))
                         )
 
                 instances[i][j] = note
