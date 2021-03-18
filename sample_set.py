@@ -47,7 +47,7 @@ class SampleSet:
 
         for i in range(len(training_datasets)):
             self.training_y_samples.append(
-                SampleSet.score_candidate_instances(training_datasets[i], training_datasets[i].instances) +
+                SampleSet.score_candidate_frequencies(training_datasets[i], training_datasets[i].motif_frequencies) +
                 LAMBDA * numpy.linalg.norm(numpy.subtract(self.training_x_samples[i], self.mean))
             )
 
@@ -73,7 +73,7 @@ class SampleSet:
 
             self.testing_x_samples.append(SampleSet.frequencies_to_vector(dataset, dataset.motif_frequencies))
             self.testing_y_samples.append(
-                SampleSet.score_candidate_instances(dataset, dataset.instances) +
+                SampleSet.score_candidate_frequencies(dataset, dataset.motif_frequencies) +
                 LAMBDA * numpy.linalg.norm(numpy.subtract(self.testing_x_samples[-1], self.mean))
             )
 
@@ -99,6 +99,16 @@ class SampleSet:
             correct += current_correct / len(dataset.instances[i]) / len(candidate_instances[i])
 
         return correct / dataset.n / dataset.w
+
+    @staticmethod
+    def score_candidate_frequencies(dataset: Dataset, candidate_frequencies: Dict[str, List[float]]) -> float:
+        score = 0
+
+        for ch in dataset.alphabet:
+            for j in range(dataset.w):
+                score += (dataset.motif_frequencies[ch][j] - candidate_frequencies[ch][j]) ** 2
+
+        return score
 
     @staticmethod
     def append_expo_to_vector(vector: List[float], x: float):
@@ -153,10 +163,10 @@ class SampleSet:
                         )
 
                         y_samples.append(
-                            SampleSet.score_candidate_instances(
+                            SampleSet.score_candidate_frequencies(
                                 dataset,
-                                instances
-                            )
+                                dataset.get_frequencies_of_instances(instances)
+                            ) + LAMBDA * numpy.linalg.norm(numpy.subtract(x_samples[-1], mean))
                         )
 
                 instances[i][j] = note
@@ -182,6 +192,8 @@ class SampleSet:
             )
 
             y_samples.append(
-                SampleSet.score_candidate_instances(dataset, instances) +
-                LAMBDA*numpy.linalg.norm(numpy.subtract(x_samples[-1], mean))
+                SampleSet.score_candidate_frequencies(
+                    dataset,
+                    dataset.get_frequencies_of_instances(instances)
+                ) + LAMBDA*numpy.linalg.norm(numpy.subtract(x_samples[-1], mean))
             )
