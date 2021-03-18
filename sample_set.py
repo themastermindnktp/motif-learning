@@ -108,23 +108,32 @@ class SampleSet:
     @staticmethod
     def frequencies_to_vector(dataset: Dataset, frequencies: Dict[str, List[float]]) -> numpy.ndarray:
         vector = [1]
-        for ch in dataset.alphabet:
-            for j in range(SIDE):
-                SampleSet.append_expo_to_vector(
-                    vector,
-                    frequencies[ch][j] / dataset.background_frequencies[ch]
-                )
-                SampleSet.append_expo_to_vector(
-                    vector,
-                    frequencies[ch][dataset.w - j - 1] / dataset.background_frequencies[ch]
-                )
+        for j in range(SIDE):
+            front_side = []
+            back_side = []
+            middle_side = []
+            for ch in dataset.alphabet:
+                front_side.append(frequencies[ch][j] / dataset.background_frequencies[ch])
+                back_side.append(frequencies[ch][dataset.w - j - 1] / dataset.background_frequencies[ch])
 
-            for j in range(SIDE):
                 frequency_sum = 0
                 for k in range(j, j + dataset.w - SIDE + 1):
                     frequency_sum += frequencies[ch][k] / dataset.background_frequencies[ch]
                 frequency_sum /= dataset.w - SIDE + 1
-                SampleSet.append_expo_to_vector(vector, frequency_sum)
+                middle_side.append(frequency_sum)
+
+            front_side.sort(reverse=True)
+            back_side.sort(reverse=True)
+            middle_side.sort(reverse=True)
+
+            for value in front_side:
+                SampleSet.append_expo_to_vector(vector, value)
+
+            for value in back_side:
+                SampleSet.append_expo_to_vector(vector, value)
+
+            for value in middle_side:
+                SampleSet.append_expo_to_vector(vector, value)
 
         return numpy.array(vector)
 
@@ -144,7 +153,7 @@ class SampleSet:
                         dataset.sequences[i].content[k + dataset.w:k + dataset.w + RIGHT_SIDE]
                     )
 
-                    if random.randrange(1, 11) == 1:
+                    if random.randrange(10) in range(5):
                         x_samples.append(
                             SampleSet.frequencies_to_vector(
                                 dataset,
